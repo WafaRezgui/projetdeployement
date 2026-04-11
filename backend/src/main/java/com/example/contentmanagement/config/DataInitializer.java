@@ -34,118 +34,105 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initializeRolesAndUsers() {
-        if (roleRepository.count() == 0) {
-            log.info("Initializing roles...");
-            
-            // Create ADMIN role with all permissions
-            Role adminRole = roleRepository.save(Role.builder()
-                    .name("ADMIN")
-                    .description("Administrator with full system access")
-                    .permissions(Set.of(
-                            "user:create", "user:read", "user:update", "user:delete",
-                            "role:create", "role:read", "role:update", "role:delete",
-                            "content:create", "content:read", "content:update", "content:delete",
-                            "category:create", "category:read", "category:update", "category:delete",
-                            "system:manage"
-                    ))
-                    .createdAt(LocalDateTime.now())
-                    .build());
+        log.info("Ensuring default roles and demo users...");
 
-            // Create MODERATOR role with moderation permissions
-            Role moderatorRole = roleRepository.save(Role.builder()
-                    .name("MODERATOR")
-                    .description("Moderator with content management permissions")
-                    .permissions(Set.of(
-                            "content:read", "content:update", "content:delete",
-                            "comment:moderate", "user:manage"
-                    ))
-                    .createdAt(LocalDateTime.now())
-                    .build());
+        Role adminRole = ensureRole(
+                "ADMIN",
+                "Administrator with full system access",
+                Set.of(
+                        "user:create", "user:read", "user:update", "user:delete",
+                        "role:create", "role:read", "role:update", "role:delete",
+                        "content:create", "content:read", "content:update", "content:delete",
+                        "category:create", "category:read", "category:update", "category:delete",
+                        "system:manage"
+                )
+        );
 
-            // Create PUBLISHER role with publishing permissions
-            Role publisherRole = roleRepository.save(Role.builder()
-                    .name("PUBLISHER")
-                    .description("Publisher with content creation permissions")
-                    .permissions(Set.of(
-                            "content:create", "content:read", "content:update",
-                            "category:read"
-                    ))
-                    .createdAt(LocalDateTime.now())
-                    .build());
+        Role moderatorRole = ensureRole(
+                "MODERATOR",
+                "Moderator with content management permissions",
+                Set.of(
+                        "content:read", "content:update", "content:delete",
+                        "comment:moderate", "user:manage"
+                )
+        );
 
-            // Create regular USER role
-            Role userRole = roleRepository.save(Role.builder()
-                    .name("USER")
-                    .description("Regular user with basic permissions")
-                    .permissions(Set.of(
-                            "content:read",
-                            "profile:update"
-                    ))
-                    .createdAt(LocalDateTime.now())
-                    .build());
+        Role publisherRole = ensureRole(
+                "PUBLISHER",
+                "Publisher with content creation permissions",
+                Set.of(
+                        "content:create", "content:read", "content:update",
+                        "category:read"
+                )
+        );
 
-            // Create VIEWER role with minimal permission
-            Role viewerRole = roleRepository.save(Role.builder()
-                    .name("VIEWER")
-                    .description("Viewer with read-only access")
-                    .permissions(Set.of("content:read"))
-                    .createdAt(LocalDateTime.now())
-                    .build());
+        Role userRole = ensureRole(
+                "USER",
+                "Regular user with basic permissions",
+                Set.of("content:read", "profile:update")
+        );
 
-            log.info("✓ Created 5 roles: ADMIN, MODERATOR, PUBLISHER, USER, VIEWER");
+        Role viewerRole = ensureRole(
+                "VIEWER",
+                "Viewer with read-only access",
+                Set.of("content:read")
+        );
 
-            if (userRepository.count() == 0) {
-                log.info("Initializing demo users...");
-                
-                User admin = User.builder()
-                        .username("admin")
-                        .email("admin@smgo.local")
-                        .password(passwordEncoder.encode("Admin@1234"))
-                        .enabled(true)
-                        .roles(Set.of(adminRole))
+        // Idempotent user bootstrap for fresh clones and partially initialized DBs.
+        ensureDemoUser("admin", "admin@smgo.local", "Admin@1234", adminRole);
+        ensureDemoUser("moderator", "moderator@smgo.local", "Moderator@1234", moderatorRole);
+        ensureDemoUser("publisher", "publisher@smgo.local", "Publisher@1234", publisherRole);
+        ensureDemoUser("user", "user@smgo.local", "User@1234", userRole);
+        ensureDemoUser("viewer", "viewer@smgo.local", "Viewer@1234", viewerRole);
+
+        log.info("✓ Default accounts ready: admin/admin@smgo.local, user/user@smgo.local");
+    }
+
+    private Role ensureRole(String name, String description, Set<String> permissions) {
+        return roleRepository.findByName(name)
+                .orElseGet(() -> roleRepository.save(Role.builder()
+                        .name(name)
+                        .description(description)
+                        .permissions(permissions)
                         .createdAt(LocalDateTime.now())
-                        .build();
+                        .build()));
+    }
 
-                User moderator = User.builder()
-                        .username("moderator")
-                        .email("moderator@smgo.local")
-                        .password(passwordEncoder.encode("Moderator@1234"))
-                        .enabled(true)
-                        .roles(Set.of(moderatorRole))
-                        .createdAt(LocalDateTime.now())
-                        .build();
+    private void ensureDemoUser(String username, String email, String password, Role role) {
+        userRepository.findByUsername(username).ifPresentOrElse(existing -> {
+            boolean needsUpdate = false;
 
-                User publisher = User.builder()
-                        .username("publisher")
-                        .email("publisher@smgo.local")
-                        .password(passwordEncoder.encode("Publisher@1234"))
-                        .enabled(true)
-                        .roles(Set.of(publisherRole))
-                        .createdAt(LocalDateTime.now())
-                        .build();
-
-                User user = User.builder()
-                        .username("user")
-                        .email("user@smgo.local")
-                        .password(passwordEncoder.encode("User@1234"))
-                        .enabled(true)
-                        .roles(Set.of(userRole))
-                        .createdAt(LocalDateTime.now())
-                        .build();
-
-                User viewer = User.builder()
-                        .username("viewer")
-                        .email("viewer@smgo.local")
-                        .password(passwordEncoder.encode("Viewer@1234"))
-                        .enabled(true)
-                        .roles(Set.of(viewerRole))
-                        .createdAt(LocalDateTime.now())
-                        .build();
-
-                userRepository.saveAll(Arrays.asList(admin, moderator, publisher, user, viewer));
-                log.info("✓ Created 5 demo users");
+            if (existing.getRole() == null || !existing.getRole().equals(role.getName())) {
+                existing.setRole(role.getName());
+                needsUpdate = true;
             }
-        }
+
+            if (existing.getRoles() == null || existing.getRoles().isEmpty()) {
+                existing.setRoles(Set.of(role));
+                needsUpdate = true;
+            }
+
+            if (!existing.isEnabled()) {
+                existing.setEnabled(true);
+                needsUpdate = true;
+            }
+
+            if (needsUpdate) {
+                existing.setUpdatedAt(LocalDateTime.now());
+                userRepository.save(existing);
+            }
+        }, () -> {
+            User user = User.builder()
+                    .username(username)
+                    .email(email)
+                    .password(passwordEncoder.encode(password))
+                    .enabled(true)
+                    .role(role.getName())
+                    .roles(Set.of(role))
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            userRepository.save(user);
+        });
     }
 
     private void initializeCategories() {
