@@ -1,0 +1,79 @@
+<div class="space-y-6 p-6 max-w-7xl mx-auto">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl text-white mb-2">Users & Loyalty Management</h1>
+      <p class="text-gray-400">Manage user accounts, subscriptions, and loyalty rewards</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="bg-[#141920] border border-[#8B5CF6]/20 rounded-lg p-6">
+      <span class="w-10 h-10 text-[#8B5CF6] mb-4"></span>
+      <h3 class="text-lg text-white mb-2">Total Users</h3>
+      <p class="text-3xl text-white mb-2">12,456</p>
+      <p class="text-sm text-green-500">+8% this month</p>
+    </div>
+    
+    <div class="bg-[#141920] border border-[#8B5CF6]/20 rounded-lg p-6">
+      <span class="w-10 h-10 text-[#8B5CF6] mb-4"></span>
+      <h3 class="text-lg text-white mb-2">Active Users</h3>
+      <p class="text-3xl text-white mb-2">8,234</p>
+      <p class="text-sm text-gray-400">Last 30 days</p>
+    </div>
+    
+    <div class="bg-[#141920] border border-[#8B5CF6]/20 rounded-lg p-6">
+      <span class="w-10 h-10 text-[#8B5CF6] mb-4"></span>
+      <h3 class="text-lg text-white mb-2">Premium Subscribers</h3>
+      <p class="text-3xl text-white mb-2">3,567</p>
+      <p class="text-sm text-gray-400">29% conversion</p>
+    </div>
+    
+    <div class="bg-[#141920] border border-[#8B5CF6]/20 rounded-lg p-6">
+      <span class="w-10 h-10 text-[#8B5CF6] mb-4"></span>
+      <h3 class="text-lg text-white mb-2">Loyalty Members</h3>
+      <p class="text-3xl text-white mb-2">5,123</p>
+      <p class="text-sm text-gray-400">Enrolled in program</p>
+    </div>
+  </div>
+
+  <div class="bg-[#141920] border border-[#8B5CF6]/20 rounded-lg p-6">
+    <div class="flex items-center justify-between gap-4 mb-4">
+      <h2 class="text-xl text-white">Users List</h2>
+      <p class="text-sm text-gray-400">All registered users</p>
+    </div>
+
+    <div *ngIf="loading" class="text-sm text-gray-400 py-6">Loading users...</div>
+
+    <div *ngIf="errorMessage" class="text-sm text-red-400 py-4">{{ errorMessage }}</div>
+
+    <div *ngIf="!loading && !errorMessage" class="overflow-x-auto">
+      <table class="min-w-full text-left">
+        <thead>
+          <tr class="border-b border-[#8B5CF6]/20 text-xs uppercase tracking-wider text-gray-400">
+            <th class="py-3 pr-4">Username</th>
+            <th class="py-3 pr-4">Email</th>
+            <th class="py-3 pr-4">Role</th>
+            <th class="py-3 pr-4">Status</th>
+            <th class="py-3 pr-4">Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users" class="border-b border-white/5 text-sm text-gray-200">
+            <td class="py-3 pr-4 font-medium text-white">{{ user.username }}</td>
+            <td class="py-3 pr-4">{{ user.email }}</td>
+            <td class="py-3 pr-4">{{ user.role || 'USER' }}</td>
+            <td class="py-3 pr-4">
+              <span [class]="user.blocked ? 'text-red-400' : 'text-green-400'">
+                {{ user.blocked ? 'Blocked' : 'Active' }}
+              </span>
+            </td>
+            <td class="py-3 pr-4 text-gray-400">{{ user.createdAt ? (user.createdAt | date:'dd/MM/yyyy') : '-' }}</td>
+          </tr>
+          <tr *ngIf="users.length === 0">
+            <td colspan="5" class="py-6 text-center text-gray-400">No users found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
