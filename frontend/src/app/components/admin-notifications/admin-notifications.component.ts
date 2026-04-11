@@ -39,6 +39,7 @@ export class AdminNotificationsComponent implements OnInit {
   showForm = false;
   editingId: string | null = null;
   notificationForm!: FormGroup;
+  currentUserId = '';
 
   constructor(
     private notificationService: NotificationService,
@@ -48,6 +49,7 @@ export class AdminNotificationsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.currentUserId = this.resolveCurrentUserId();
     this.loadNotifications();
   }
 
@@ -101,6 +103,7 @@ export class AdminNotificationsComponent implements OnInit {
     const formData = {
       message: this.notificationForm.value.message,
       title: this.notificationForm.value.title,
+      userId: this.currentUserId,
       type: 'INFO',
       isRead: false,
     };
@@ -206,6 +209,21 @@ export class AdminNotificationsComponent implements OnInit {
     if (errors['maxlength']) return `${fieldName} must not exceed ${errors['maxlength'].requiredLength} characters`;
 
     return 'Invalid value';
+  }
+
+  private resolveCurrentUserId(): string {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        if (parsed?.userId) {
+          return String(parsed.userId);
+        }
+      } catch {
+        // Continue with fallback.
+      }
+    }
+    return 'admin';
   }
 }
 

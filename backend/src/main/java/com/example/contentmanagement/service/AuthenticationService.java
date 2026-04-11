@@ -2,6 +2,7 @@ package com.example.contentmanagement.service;
 
 import com.example.contentmanagement.dto.AuthRequest;
 import com.example.contentmanagement.dto.AuthResponse;
+import com.example.contentmanagement.dto.ForgotPasswordRequest;
 
 /**
  * Authentication Service Interface
@@ -26,4 +27,12 @@ public interface AuthenticationService {
      * @return AuthResponse with JWT token and user info
      */
     AuthResponse login(AuthRequest authRequest);
+
+    /**
+     * Reset user password by email
+     * WHY: Supports password recovery for users who forgot credentials
+     *
+     * @param forgotPasswordRequest Recovery payload with email and new password
+     */
+    void forgotPassword(ForgotPasswordRequest forgotPasswordRequest);
 }

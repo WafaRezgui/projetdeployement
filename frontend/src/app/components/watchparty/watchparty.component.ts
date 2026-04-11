@@ -259,11 +259,23 @@ export class WatchPartyComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private resolveCurrentUserId(): string {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        if (parsed?.userId) {
+          return String(parsed.userId);
+        }
+      } catch {
+        // Continue with next strategy.
+      }
+    }
+
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
       if (token) {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        const tokenUserId = payload.sub || payload.userId || payload.id;
+        const tokenUserId = payload.userId || payload.id || payload.sub;
         if (tokenUserId) {
           return String(tokenUserId);
         }

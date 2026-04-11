@@ -17,7 +17,9 @@ import {
   Ticket,
   ArrowRight,
   Tag,
+  LogOut,
 } from 'lucide-angular';
+import { AuthService } from '../services/auth.service';
 
 interface TabItem {
   id: string;
@@ -75,7 +77,7 @@ interface ModuleTab {
 
         <!-- Sidebar Footer -->
         <div class="border-t border-[#8B5CF6]/20 p-4">
-          <div class="flex items-center justify-between gap-3">
+          <div class="flex flex-col gap-3">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-10 h-10 bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] rounded-xl flex items-center justify-center shrink-0">
                 <span class="w-6 h-6 text-white"></span>
@@ -86,10 +88,10 @@ interface ModuleTab {
               </div>
             </div>
             <button
-              (click)="switchToUser()"
-              class="flex items-center justify-center gap-2 px-4 py-2 border border-[#8B5CF6] text-[#8B5CF6] hover:bg-[#8B5CF6]/10 rounded-lg transition-all text-sm shrink-0">
+              (click)="logout()"
+              class="w-full flex items-center justify-center gap-2 px-4 py-2 border border-red-500/60 text-red-300 hover:bg-red-500/10 rounded-lg transition-all text-sm">
               <span class="w-4 h-4"></span>
-              <span>User Panel</span>
+              <span>Log Out</span>
             </button>
           </div>
         </div>
@@ -139,6 +141,7 @@ export class AdminLayoutComponent {
   readonly XIcon = X;
   readonly ArrowRightIcon = ArrowRight;
   readonly TagIcon = Tag;
+  readonly LogOutIcon = LogOut;
 
   sidebarOpen = signal(true);
 
@@ -158,14 +161,15 @@ export class AdminLayoutComponent {
     { id: 'users', label: 'Users & Loyalty', icon: UserCog, route: '/admin/users' },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   toggleSidebar() {
     this.sidebarOpen.set(!this.sidebarOpen());
   }
 
-  switchToUser() {
-    this.router.navigate(['/user']);
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 }
 

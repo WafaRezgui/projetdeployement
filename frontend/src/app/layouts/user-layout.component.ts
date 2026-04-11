@@ -16,8 +16,10 @@ import {
   Menu,
   X,
   ArrowRight,
+  LogOut,
 } from 'lucide-angular';
 import { trigger, style, transition, animate } from '@angular/animations';
+import { AuthService } from '../services/auth.service';
 
 interface TabItem {
   id: string;
@@ -49,6 +51,14 @@ interface TabItem {
             </div>
 
             <button
+              (click)="logout()"
+              class="hidden md:flex items-center gap-2 px-3 py-2 border border-red-500/60 text-red-300 hover:bg-red-500/10 rounded-lg transition-all text-sm shrink-0"
+            >
+              <span class="w-4 h-4"></span>
+              <span>Log Out</span>
+            </button>
+
+            <button
               (click)="toggleMobileMenu()"
               class="md:hidden p-2 text-gray-400 hover:text-white hover:bg-[#8B5CF6]/10 rounded-lg shrink-0">
               <span class="w-6 h-6"></span>
@@ -78,10 +88,10 @@ interface TabItem {
               <span>{{ tab.label }}</span>
             </a>
             <button
-              (click)="switchToAdmin()"
-              class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-[#8B5CF6]/10 border-t border-[#8B5CF6]/20 mt-4 pt-4">
+              (click)="logout()"
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-300 hover:text-red-200 hover:bg-red-500/10 border-t border-[#8B5CF6]/20 mt-3 pt-4">
               <span class="w-5 h-5"></span>
-              <span>Admin Panel</span>
+              <span>Log Out</span>
             </button>
           </div>
         </div>
@@ -102,12 +112,6 @@ interface TabItem {
                 <p class="text-sm text-white">ShowMatchGoOn</p>
                 <p class="text-xs text-gray-400">© 2026 All rights reserved</p>
               </div>
-              <button
-                (click)="switchToAdmin()"
-                class="hidden md:flex items-center gap-2 px-4 py-2 border border-[#8B5CF6] text-[#8B5CF6] hover:bg-[#8B5CF6]/10 rounded-lg transition-all text-sm ml-2">
-                <span class="w-4 h-4"></span>
-                <span>Admin Panel</span>
-              </button>
             </div>
             <div class="flex items-center gap-6 text-sm text-gray-400">
               <a href="#" class="hover:text-[#8B5CF6] transition-colors">Privacy Policy</a>
@@ -147,6 +151,8 @@ export class UserLayoutComponent {
   readonly ArrowRightIcon = ArrowRight;
   readonly MenuIcon = Menu;
   readonly XIcon = X;
+  readonly LogOutIcon = LogOut;
+  constructor(private authService: AuthService, private router: Router) {}
 
   mobileMenuOpen = signal(false);
 
@@ -167,14 +173,14 @@ export class UserLayoutComponent {
     { id: 'fidelities', label: 'Loyalty', icon: Award, route: '/user/fidelities' },
   ];
 
-  constructor(private router: Router) {}
-
   toggleMobileMenu(): void {
     this.mobileMenuOpen.set(!this.mobileMenuOpen());
   }
 
-  switchToAdmin(): void {
-    this.router.navigate(['/admin']);
+  logout(): void {
+    this.authService.logout();
+    this.mobileMenuOpen.set(false);
+    this.router.navigate(['/auth/login']);
   }
 }
 

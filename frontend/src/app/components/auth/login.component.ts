@@ -49,6 +49,10 @@ import { CustomValidators } from '../../services/validators';
             </div>
           </div>
 
+          <div class="text-right -mt-2">
+            <a routerLink="/auth/forgot-password" class="text-sm text-blue-500 hover:text-blue-700 font-medium">Forgot password?</a>
+          </div>
+
           <!-- Error Message -->
           <div *ngIf="errorMessage" class="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {{ errorMessage }}
@@ -148,8 +152,8 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
         // Get user role and redirect accordingly
-        const role = localStorage.getItem('userRole');
-        if (role === 'ADMIN') {
+        const role = (localStorage.getItem('userRole') || '').toUpperCase();
+        if (role.includes('ADMIN')) {
           this.router.navigate(['/admin/content']);
         } else {
           this.router.navigate(['/user/home']);

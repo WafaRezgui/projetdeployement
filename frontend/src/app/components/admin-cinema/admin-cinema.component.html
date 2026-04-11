@@ -112,8 +112,8 @@
         <input [(ngModel)]="salleForm.name" placeholder="Hall name" />
         <input [(ngModel)]="salleForm.capacity" type="number" min="1" placeholder="Capacity" />
         <div class="form-actions full-row">
-          <button class="primary-btn" (click)="createSalle()">Create</button>
-          <button class="ghost-btn" (click)="showSalleForm = false">Cancel</button>
+          <button class="primary-btn" (click)="createSalle()">{{ editingSalleId ? 'Update' : 'Create' }}</button>
+          <button class="ghost-btn" (click)="showSalleForm = false; editingSalleId = null">Cancel</button>
         </div>
       </div>
 
@@ -190,8 +190,8 @@
         </select>
         <input [(ngModel)]="seanceForm.contenuId" placeholder="Content ID" class="full-row" />
         <div class="form-actions full-row">
-          <button class="primary-btn" (click)="createSeance()">Create</button>
-          <button class="ghost-btn" (click)="showSeanceForm = false">Cancel</button>
+          <button class="primary-btn" (click)="createSeance()">{{ editingSeanceId ? 'Update' : 'Create' }}</button>
+          <button class="ghost-btn" (click)="showSeanceForm = false; editingSeanceId = null">Cancel</button>
         </div>
       </div>
 
@@ -259,6 +259,23 @@
       <div class="table-head">
         <h2>Reservations (from backend)</h2>
         <button class="refresh-btn" (click)="loadAll()">Refresh</button>
+      </div>
+
+      <div *ngIf="showReservationForm" class="inline-form form-grid-2">
+        <select [(ngModel)]="reservationForm.seanceId" title="Session selection">
+          <option value="">Select session</option>
+          <option *ngFor="let seance of seances" [value]="seance.id">
+            {{ seance.nomCinema }} - {{ seance.numeroSalle }} - {{ seance.dateSeance }} {{ seance.heureSeance }}
+          </option>
+        </select>
+        <input [(ngModel)]="reservationForm.userId" title="User ID" placeholder="User ID" />
+        <input [(ngModel)]="reservationForm.numeroPlace" title="Seat number" placeholder="Seat number (e.g. A12)" />
+        <input [(ngModel)]="reservationForm.prix" title="Price" type="number" min="0.01" step="0.01" placeholder="Price" />
+        <input [(ngModel)]="reservationForm.contenuId" title="Content ID" placeholder="Content ID" class="full-row" />
+        <div class="form-actions full-row">
+          <button class="primary-btn" (click)="saveReservation()">{{ editingReservationId ? 'Update' : 'Create' }}</button>
+          <button class="ghost-btn" (click)="showReservationForm = false; editingReservationId = null">Cancel</button>
+        </div>
       </div>
 
       <table>

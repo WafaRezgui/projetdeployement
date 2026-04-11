@@ -288,6 +288,7 @@ export function AdminUsers() {
           <select
             value={filterTier}
             onChange={(e) => setFilterTier(e.target.value)}
+            title="Filter users by tier"
             className="w-full md:w-48 bg-[#0B0E14] border border-[#8B5CF6]/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#8B5CF6]"
           >
             <option value="all">All Tiers</option>

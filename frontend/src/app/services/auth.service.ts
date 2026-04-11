@@ -26,6 +26,11 @@ export interface AuthRequest {
   email?: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+  newPassword: string;
+}
+
 /**
  * Current User Model
  */
@@ -99,6 +104,21 @@ export class AuthService {
   }
 
   /**
+   * Reset password using email and a new password
+   * WHY: Allows users to recover account access when they forget their password
+   */
+  forgotPassword(request: ForgotPasswordRequest): Observable<string> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, request, { responseType: 'text' })
+      .pipe(
+        catchError(error => {
+          const message = error.error?.message || error.error || 'Password reset failed';
+          alert(`Password reset failed: ${message}`);
+          return this.handleError(error);
+        })
+      );
+  }
+
+  /**
    * Handle successful authentication response
    * WHY: Stores token, updates user state, and notifies subscribers
    * @param response Authentication response from backend
@@ -131,6 +151,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('userRole');
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }

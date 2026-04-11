@@ -2,6 +2,7 @@ package com.example.contentmanagement.service.impl;
 
 import com.example.contentmanagement.dto.AuthRequest;
 import com.example.contentmanagement.dto.AuthResponse;
+import com.example.contentmanagement.dto.ForgotPasswordRequest;
 import com.example.contentmanagement.dto.UserDTO;
 import com.example.contentmanagement.entity.Role;
 import com.example.contentmanagement.entity.User;
@@ -11,6 +12,7 @@ import com.example.contentmanagement.repository.UserRepository;
 import com.example.contentmanagement.security.JwtTokenProvider;
 import com.example.contentmanagement.service.AuthenticationService;
 import com.example.contentmanagement.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,6 +41,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Register a new user
@@ -65,6 +68,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // Authenticate the newly created user
         return login(authRequest);
+    }
+
+    /**
+     * Reset password using user email
+     * WHY: Provides basic password recovery without requiring authenticated session
+     */
+    @Override
+    @Transactional
+    public void forgotPassword(ForgotPasswordRequest forgotPasswordRequest) {
+        User user = userRepository.findByEmail(forgotPasswordRequest.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + forgotPasswordRequest.getEmail()));
+
+        user.setPassword(passwordEncoder.encode(forgotPasswordRequest.getNewPassword()));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        log.info("Password reset completed for user: {}", user.getUsername());
     }
 
     /**

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AdminLayoutComponent } from './layouts/admin-layout.component';
 import { UserLayoutComponent } from './layouts/user-layout.component';
+import { adminGuard, userGuard } from './guards/auth.guard';
 
 /**
  * Application Routes Configuration
@@ -18,11 +19,17 @@ export const routes: Routes = [
     loadComponent: () => import('./components/auth/register.component').then(m => m.RegisterComponent),
     data: { title: 'Register' }
   },
+  {
+    path: 'auth/forgot-password',
+    loadComponent: () => import('./components/auth/forgot-password.component').then(m => m.ForgotPasswordComponent),
+    data: { title: 'Forgot Password' }
+  },
 
   // Admin panel with layout
   {
     path: 'admin',
     component: AdminLayoutComponent,
+    canActivate: [adminGuard],
     children: [
       {
         path: 'users',
@@ -86,6 +93,7 @@ export const routes: Routes = [
   {
     path: 'user',
     component: UserLayoutComponent,
+    canActivate: [userGuard],
     children: [
       {
         path: 'home',
@@ -166,14 +174,14 @@ export const routes: Routes = [
 
   {
     path: '',
-    redirectTo: '/admin',
+    redirectTo: '/auth/login',
     pathMatch: 'full'
   },
 
   // Wildcard route for 404
   {
     path: '**',
-    redirectTo: '/admin'
+    redirectTo: '/auth/login'
   }
 ];
 

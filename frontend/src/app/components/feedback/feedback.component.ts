@@ -85,11 +85,23 @@ export class FeedbackComponent implements OnInit, OnChanges, AfterViewChecked {
   }
 
   private resolveCurrentUserId(): string {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        if (parsed?.userId) {
+          return String(parsed.userId);
+        }
+      } catch {
+        // Continue with token/local fallback.
+      }
+    }
+
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
       if (token) {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        const tokenUserId = payload.sub || payload.userId || payload.id;
+        const tokenUserId = payload.userId || payload.id || payload.sub;
         if (tokenUserId) {
           return String(tokenUserId);
         }
@@ -164,6 +176,16 @@ export class FeedbackComponent implements OnInit, OnChanges, AfterViewChecked {
   submit(form: NgForm): void {
     this.successMessage = '';
     this.errorMessage = '';
+
+    if (!this.watchPartyId) {
+      this.errorMessage = 'Please select a WatchParty first.';
+      return;
+    }
+
+    if (!this.isParticipant) {
+      this.errorMessage = 'You must join this WatchParty before adding feedback.';
+      return;
+    }
 
     if (form.invalid || !this.note) {
       form.control.markAllAsTouched();

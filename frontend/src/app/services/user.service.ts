@@ -21,6 +21,14 @@ export class UserService {
     return this.http.get<UserDTO[]>(this.apiUrl);
   }
 
+  updateUser(id: string, data: Partial<UserDTO>): Observable<UserDTO> {
+    return this.http.put<UserDTO>(`${this.apiUrl}/${id}`, data);
+  }
+
+  deleteUser(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
   getMyProfile(): Observable<UserDTO> {
     return this.http.get<UserDTO>(`${this.apiUrl}/me`);
   }

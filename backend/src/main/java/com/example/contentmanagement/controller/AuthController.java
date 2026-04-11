@@ -2,6 +2,7 @@ package com.example.contentmanagement.controller;
 
 import com.example.contentmanagement.dto.AuthRequest;
 import com.example.contentmanagement.dto.AuthResponse;
+import com.example.contentmanagement.dto.ForgotPasswordRequest;
 import com.example.contentmanagement.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,18 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest authRequest) {
         AuthResponse response = authenticationService.login(authRequest);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Reset user password by email
+     * WHY: Provides a recovery path when users forget credentials
+     *
+     * @param forgotPasswordRequest Password reset payload (email + new password)
+     * @return Success message
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        authenticationService.forgotPassword(forgotPasswordRequest);
+        return ResponseEntity.ok("Password reset successful");
     }
 }

@@ -13,6 +13,7 @@ import {
   SalleResponseDTO,
   SeanceRequestDTO,
   SeanceResponseDTO,
+  ReservationRequestDTO,
 } from '../../services/cinema-api.service';
 
 type SarraModule = 'cinemas' | 'salles' | 'seances' | 'reservations';
@@ -44,9 +45,13 @@ export class AdminCinemaComponent implements OnInit {
   error: string | null = null;
   activeTab: SarraModule = 'cinemas';
   editingCinemaId: string | null = null;
+  editingSalleId: string | null = null;
+  editingSeanceId: string | null = null;
+  editingReservationId: string | null = null;
   showCinemaForm = false;
   showSalleForm = false;
   showSeanceForm = false;
+  showReservationForm = false;
 
   cinemaForm: CinemaRequestDTO = {
     nom: '',
@@ -64,6 +69,14 @@ export class AdminCinemaComponent implements OnInit {
     heureSeance: '',
     salleId: '',
     cinemaId: '',
+    contenuId: '',
+  };
+
+  reservationForm: ReservationRequestDTO = {
+    seanceId: '',
+    userId: '',
+    numeroPlace: '',
+    prix: 0,
     contenuId: '',
   };
 
@@ -171,11 +184,13 @@ export class AdminCinemaComponent implements OnInit {
 
   openCreateSalle(): void {
     this.showSalleForm = true;
+    this.editingSalleId = null;
     this.salleForm = { name: '', capacity: 60 };
   }
 
   openCreateSeance(): void {
     this.showSeanceForm = true;
+    this.editingSeanceId = null;
     this.seanceForm = {
       dateSeance: '',
       heureSeance: '',
@@ -186,19 +201,98 @@ export class AdminCinemaComponent implements OnInit {
   }
 
   openCreateReservation(): void {
-    this.error = 'Create reservation from the user cinema flow to preserve business rules.';
+    this.showReservationForm = true;
+    this.editingReservationId = null;
+    this.reservationForm = {
+      seanceId: '',
+      userId: '',
+      numeroPlace: '',
+      prix: 0,
+      contenuId: '',
+    };
   }
 
-  editSalle(_salle: SalleResponseDTO): void {
-    this.error = 'Edit hall is not implemented yet.';
+  editSalle(salle: SalleResponseDTO): void {
+    this.showSalleForm = true;
+    this.editingSalleId = salle.id;
+    this.salleForm = {
+      name: salle.name,
+      capacity: salle.capacity
+    };
   }
 
-  editSeance(_seance: SeanceResponseDTO): void {
-    this.error = 'Edit session is not implemented yet.';
+  editSeance(seance: SeanceResponseDTO): void {
+    const matchedSalle = this.salles.find((s) => s.name === seance.numeroSalle);
+    const matchedCinema = this.cinemas.find((c) => c.nom === seance.nomCinema);
+
+    this.showSeanceForm = true;
+    this.editingSeanceId = seance.id;
+    this.seanceForm = {
+      dateSeance: seance.dateSeance,
+      heureSeance: seance.heureSeance,
+      salleId: matchedSalle?.id || '',
+      cinemaId: matchedCinema?.id || '',
+      contenuId: seance.contenuId || ''
+    };
   }
 
-  editReservation(_reservation: ReservationResponseDTO): void {
-    this.error = 'Edit reservation is not implemented yet.';
+  editReservation(reservation: ReservationResponseDTO): void {
+    const matchedSeance = this.seances.find(
+      (s) =>
+        s.nomCinema === reservation.nomCinema &&
+        s.numeroSalle === reservation.numeroSalle &&
+        String(s.dateSeance) === String(reservation.dateSeance) &&
+        s.heureSeance === reservation.heureSeance
+    );
+
+    this.showReservationForm = true;
+    this.editingReservationId = reservation.id;
+    this.reservationForm = {
+      seanceId: matchedSeance?.id || '',
+      userId: reservation.userId,
+      numeroPlace: reservation.numeroPlace,
+      prix: reservation.prix,
+      contenuId: reservation.contenuId || '',
+    };
+  }
+
+  saveReservation(): void {
+    if (!this.reservationForm.seanceId || !this.reservationForm.userId.trim() || !this.reservationForm.numeroPlace.trim() || this.reservationForm.prix <= 0) {
+      this.error = 'Session, user ID, seat number and positive price are required.';
+      return;
+    }
+
+    const payload: ReservationRequestDTO = {
+      seanceId: this.reservationForm.seanceId,
+      userId: this.reservationForm.userId.trim(),
+      numeroPlace: this.reservationForm.numeroPlace.trim(),
+      prix: this.reservationForm.prix,
+      contenuId: this.reservationForm.contenuId?.trim() || undefined,
+    };
+
+    this.loading = true;
+    const request$ = this.editingReservationId
+      ? this.cinemaApi.updateReservation(this.editingReservationId, payload)
+      : this.cinemaApi.createReservation(payload);
+
+    request$.subscribe({
+      next: () => {
+        this.showReservationForm = false;
+        this.editingReservationId = null;
+        this.reservationForm = {
+          seanceId: '',
+          userId: '',
+          numeroPlace: '',
+          prix: 0,
+          contenuId: '',
+        };
+        this.loadAll();
+      },
+      error: (err: unknown) => {
+        this.loading = false;
+        this.error = this.toErrorMessage(err, this.editingReservationId ? 'Failed to update reservation.' : 'Failed to create reservation.');
+      },
+    });
   }
 
   deleteReservation(id: string): void {
@@ -219,6 +313,7 @@ export class AdminCinemaComponent implements OnInit {
   }
 
   editCinema(cinema: CinemaResponseDTO): void {
+    this.showCinemaForm = true;
     this.editingCinemaId = cinema.id;
     this.cinemaForm = {
       nom: cinema.nom,
@@ -299,18 +394,25 @@ export class AdminCinemaComponent implements OnInit {
     }
 
     this.loading = true;
-    this.cinemaApi.createSalle({
+    const payload: SalleRequestDTO = {
       name: this.salleForm.name.trim(),
       capacity: this.salleForm.capacity,
-    }).subscribe({
+    };
+
+    const request$ = this.editingSalleId
+      ? this.cinemaApi.updateSalle(this.editingSalleId, payload)
+      : this.cinemaApi.createSalle(payload);
+
+    request$.subscribe({
       next: () => {
         this.showSalleForm = false;
+        this.editingSalleId = null;
         this.salleForm = { name: '', capacity: 60 };
         this.loadAll();
       },
       error: (err: unknown) => {
         this.loading = false;
-        this.error = this.toErrorMessage(err, 'Failed to create salle.');
+        this.error = this.toErrorMessage(err, this.editingSalleId ? 'Failed to update hall.' : 'Failed to create hall.');
       },
     });
   }
@@ -339,15 +441,22 @@ export class AdminCinemaComponent implements OnInit {
     }
 
     this.loading = true;
-    this.cinemaApi.createSeance({
+    const payload: SeanceRequestDTO = {
       dateSeance: this.seanceForm.dateSeance,
       heureSeance: this.seanceForm.heureSeance,
       salleId: this.seanceForm.salleId,
       cinemaId: this.seanceForm.cinemaId,
       contenuId: this.seanceForm.contenuId?.trim() || undefined,
-    }).subscribe({
+    };
+
+    const request$ = this.editingSeanceId
+      ? this.cinemaApi.updateSeance(this.editingSeanceId, payload)
+      : this.cinemaApi.createSeance(payload);
+
+    request$.subscribe({
       next: () => {
         this.showSeanceForm = false;
+        this.editingSeanceId = null;
         this.seanceForm = {
           dateSeance: '',
           heureSeance: '',
@@ -359,7 +468,7 @@ export class AdminCinemaComponent implements OnInit {
       },
       error: (err: unknown) => {
         this.loading = false;
-        this.error = this.toErrorMessage(err, 'Failed to create seance.');
+        this.error = this.toErrorMessage(err, this.editingSeanceId ? 'Failed to update session.' : 'Failed to create session.');
       },
     });
   }

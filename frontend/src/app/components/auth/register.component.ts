@@ -241,8 +241,8 @@ export class RegisterComponent implements OnInit {
         this.successMessage = 'Account created successfully! Redirecting...';
         setTimeout(() => {
           // Get user role and redirect accordingly
-          const role = localStorage.getItem('userRole');
-          if (role === 'ADMIN') {
+          const role = (localStorage.getItem('userRole') || '').toUpperCase();
+          if (role.includes('ADMIN')) {
             this.router.navigate(['/admin/content']);
           } else {
             this.router.navigate(['/user/home']);

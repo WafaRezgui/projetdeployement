@@ -34,10 +34,10 @@ export const adminGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: 
     return false;
   }
 
-  const user = authService.getCurrentUser();
-  const role = localStorage.getItem('userRole');
+  const role = (localStorage.getItem('userRole') || '').toUpperCase();
+  const isAdmin = role.includes('ADMIN');
 
-  if (role === 'ADMIN') {
+  if (isAdmin) {
     return true;
   }
 
@@ -59,9 +59,10 @@ export const userGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
     return false;
   }
 
-  const role = localStorage.getItem('userRole');
+  const role = (localStorage.getItem('userRole') || '').toUpperCase();
+  const isAdmin = role.includes('ADMIN');
 
-  if (role !== 'ADMIN') {
+  if (!isAdmin) {
     return true;
   }
 

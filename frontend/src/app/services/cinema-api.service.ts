@@ -93,6 +93,10 @@ export class CinemaApiService {
     return this.http.post<SalleResponseDTO>(`${this.baseUrl}/salles`, payload);
   }
 
+  updateSalle(id: string, payload: SalleRequestDTO): Observable<SalleResponseDTO> {
+    return this.http.put<SalleResponseDTO>(`${this.baseUrl}/salles/${id}`, payload);
+  }
+
   deleteSalle(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/salles/${id}`);
   }
@@ -109,6 +113,10 @@ export class CinemaApiService {
     return this.http.post<SeanceResponseDTO>(`${this.baseUrl}/seances`, payload);
   }
 
+  updateSeance(id: string, payload: SeanceRequestDTO): Observable<SeanceResponseDTO> {
+    return this.http.put<SeanceResponseDTO>(`${this.baseUrl}/seances/${id}`, payload);
+  }
+
   deleteSeance(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/seances/${id}`);
   }
@@ -123,6 +131,10 @@ export class CinemaApiService {
 
   createReservation(payload: ReservationRequestDTO): Observable<ReservationResponseDTO> {
     return this.http.post<ReservationResponseDTO>(`${this.baseUrl}/reservations`, payload);
+  }
+
+  updateReservation(id: string, payload: ReservationRequestDTO): Observable<ReservationResponseDTO> {
+    return this.http.put<ReservationResponseDTO>(`${this.baseUrl}/reservations/${id}`, payload);
   }
 
   deleteReservation(id: string): Observable<void> {
