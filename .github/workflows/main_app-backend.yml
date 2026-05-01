@@ -1,6 +1,5 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy JAR app to Azure Web App - app-backend
 
 on:
@@ -28,11 +27,14 @@ jobs:
         run: mvn clean package -DskipTests
         working-directory: backend
 
+      - name: Rename JAR to app.jar
+        run: cp backend/target/content-management-0.0.1-SNAPSHOT.jar backend/target/app.jar
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: ${{ github.workspace }}/backend/target/*.jar
+          path: backend/target/app.jar
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,4 +61,4 @@ jobs:
         with:
           app-name: app-backend
           slot-name: Production
-          package: "*.jar"
+          package: app.jar
