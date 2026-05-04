@@ -60,7 +60,6 @@ public class User {
     // Support for direct role string (from MongoDB)
     private String role;
 
-    @Transient
     @DBRef
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
