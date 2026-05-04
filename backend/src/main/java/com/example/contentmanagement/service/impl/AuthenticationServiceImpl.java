@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Authentication Service Implementation
@@ -91,18 +92,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * Authenticate user and generate JWT token
      * WHY: Centralized authentication logic with proper error handling
      * Generates token only after successful authentication
+     * Reads roles from the roles collection (Set<Role>) with fallback to legacy role string
      */
     @Override
     @Transactional
     public AuthResponse login(AuthRequest authRequest) {
         try {
             log.info("Login attempt for user: {}", authRequest.getUsername());
-            
+
             // Get user to check status
             User user = userRepository.findByUsername(authRequest.getUsername())
                     .orElseThrow(() -> new UnauthorizedException("Invalid username or password"));
-            
-            log.info("User found: {}, role: {}", user.getUsername(), user.getRole());
+
+            log.info("User found: {}, roles: {}", user.getUsername(), user.getRoles());
 
             // Check if account is locked
             if (user.isLocked()) {
@@ -117,7 +119,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             }
 
             log.info("Account enabled and unlocked, attempting authentication");
-            
+
             // Authenticate using Spring Security's AuthenticationManager
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -125,7 +127,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                             authRequest.getPassword()
                     )
             );
-            
+
             log.info("Authentication successful for: {}", authRequest.getUsername());
 
             // Get UserDetails for token generation
@@ -139,10 +141,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             user.setLastLoginAt(LocalDateTime.now());
             userRepository.save(user);
 
-            // Get user info for response
-            UserDTO userDTO = buildUserDTO(user);
+            // Build role/roles for response:
+            // Priority 1 → roles collection (Set<Role>)
+            // Priority 2 → legacy role string
+            // Priority 3 → default "USER"
+            final List<String> roleNames;
+            final String primaryRole;
 
-            log.info("User logged in successfully: {}", authRequest.getUsername());
+            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                roleNames = user.getRoles().stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toList());
+                primaryRole = roleNames.get(0);
+            } else if (user.getRole() != null) {
+                roleNames = List.of(user.getRole());
+                primaryRole = user.getRole();
+            } else {
+                roleNames = List.of("USER");
+                primaryRole = "USER";
+            }
+
+            log.info("User logged in successfully: {} with roles: {}", authRequest.getUsername(), roleNames);
 
             // Return response with token and user info
             return AuthResponse.builder()
@@ -150,8 +169,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .username(user.getUsername())
                     .email(user.getEmail())
                     .userId(user.getId())
-                    .role(user.getRole() != null ? user.getRole() : "USER")
-                    .roles(user.getRole() != null ? List.of(user.getRole()) : List.of("USER"))
+                    .role(primaryRole)
+                    .roles(roleNames)
                     .message("Login successful")
                     .build();
 
