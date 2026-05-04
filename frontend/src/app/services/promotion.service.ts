@@ -14,8 +14,7 @@ export interface Promotion {
 @Injectable({ providedIn: 'root' })
 export class PromotionService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8090/api/promotions';
-
+private apiUrl = 'https://app-backend-linux.azurewebsites.net/api/promotions';
   getActive(): Observable<Promotion[]> {
     return this.http.get<Promotion[]>(this.apiUrl);
   }

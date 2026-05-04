@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
-  const API_URL = 'http://localhost:8090/api/auth';
+  const API_URL = 'https://app-backend-linux.azurewebsites.net/api/auth';
 
   beforeEach(() => {
     TestBed.configureTestingModule({

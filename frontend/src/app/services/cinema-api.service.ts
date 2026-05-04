@@ -65,7 +65,7 @@ export interface ReservationResponseDTO {
   providedIn: 'root',
 })
 export class CinemaApiService {
-  private readonly baseUrl = 'http://localhost:8090/api';
+  private readonly baseUrl = 'https://app-backend-linux.azurewebsites.net/api';
 
   constructor(private readonly http: HttpClient) {}
 

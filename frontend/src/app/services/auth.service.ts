@@ -49,7 +49,7 @@ export interface CurrentUser {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8090/api/auth';
+private apiUrl = 'https://app-backend-linux.azurewebsites.net/api/auth';
   private currentUserSubject = new BehaviorSubject<CurrentUser | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 

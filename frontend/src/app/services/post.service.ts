@@ -13,7 +13,7 @@ export interface Post {
 @Injectable({ providedIn: 'root' })
 export class PostService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8090/api/posts';
+  private apiUrl = 'https://app-backend-linux.azurewebsites.net/api/posts';
 
   getPosts(): Observable<Post[]> {
     return this.http.get<Post[]>(this.apiUrl);

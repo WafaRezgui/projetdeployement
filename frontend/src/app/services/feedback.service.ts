@@ -7,8 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class FeedbackService {
 
-  private apiUrl = 'http://localhost:8090/feedback';
-
+private apiUrl = 'https://app-backend-linux.azurewebsites.net/feedback';
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<any[]> {

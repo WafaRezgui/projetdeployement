@@ -15,8 +15,7 @@ export interface UserDTO {
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8090/api/users';
-
+private apiUrl = 'https://app-backend-linux.azurewebsites.net/api/users';
   getAllUsers(): Observable<UserDTO[]> {
     return this.http.get<UserDTO[]>(this.apiUrl);
   }

@@ -13,8 +13,7 @@ export interface Commentaire {
 @Injectable({ providedIn: 'root' })
 export class CommentaireService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8090/api/commentaires';
-
+private apiUrl = 'https://app-backend-linux.azurewebsites.net/api/commentaires';
   getByPostId(postId: string): Observable<Commentaire[]> {
     return this.http.get<Commentaire[]>(`${this.apiUrl}/post/${postId}`);
   }

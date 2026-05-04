@@ -5,7 +5,7 @@ import { Abonnement, AbonnementRequest } from '../models/abonnement.model';
 
 @Injectable({ providedIn: 'root' })
 export class AbonnementService {
-  private readonly apiUrl = 'http://localhost:8090/api/abonnements';
+  private readonly apiUrl = 'https://app-backend-linux.azurewebsites.net/api/abonnements';
 
   constructor(private http: HttpClient) {}
 

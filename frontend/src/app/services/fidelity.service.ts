@@ -5,7 +5,7 @@ import { Fidelity, FidelityRequest } from '../models/fidelity.model';
 
 @Injectable({ providedIn: 'root' })
 export class FidelityService {
-  private readonly apiUrl = 'http://localhost:8090/api/fidelities';
+  private readonly apiUrl = 'https://app-backend-linux.azurewebsites.net/api/fidelities';
 
   constructor(private http: HttpClient) {}
 

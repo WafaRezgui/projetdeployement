@@ -72,7 +72,6 @@ export interface PageResponseDTO<T> {
   hasPrevious: boolean;
 }
 
-// Legacy interfaces for backward compatibility
 export interface Film extends FilmDTO {}
 export interface Series extends SeriesDTO {}
 export interface Documentary extends DocumentaryDTO {}
@@ -84,75 +83,51 @@ export interface Notification extends NotificationDTO {}
   providedIn: 'root'
 })
 export class ContentService {
-  private contentsBaseUrl = 'http://localhost:8090/api/contents';
-  private categoriesBaseUrl = 'http://localhost:8090/api/categories';
-  private genresBaseUrl = 'http://localhost:8090/api/genres';
-  private notificationsBaseUrl = 'http://localhost:8090/api/notifications';
+  private contentsBaseUrl = 'https://app-backend-linux.azurewebsites.net/api/contents';
+  private categoriesBaseUrl = 'https://app-backend-linux.azurewebsites.net/api/categories';
+  private genresBaseUrl = 'https://app-backend-linux.azurewebsites.net/api/genres';
+  private notificationsBaseUrl = 'https://app-backend-linux.azurewebsites.net/api/notifications';
 
   constructor(private http: HttpClient) { }
 
-  // ==================== FILMS CRUD ====================
-
   createFilm(film: FilmDTO): Observable<FilmDTO> {
     return this.http.post<FilmDTO>(`${this.contentsBaseUrl}/films`, film)
-      .pipe(
-        catchError(error => this.handleError('create', 'Film', error))
-      );
+      .pipe(catchError(error => this.handleError('create', 'Film', error)));
   }
 
   getFilmById(id: string): Observable<FilmDTO> {
     return this.http.get<FilmDTO>(`${this.contentsBaseUrl}/${id}`)
-      .pipe(
-        catchError(error => this.handleError('read', 'Film', error))
-      );
+      .pipe(catchError(error => this.handleError('read', 'Film', error)));
   }
 
   updateFilm(id: string, film: FilmDTO): Observable<FilmDTO> {
     return this.http.put<FilmDTO>(`${this.contentsBaseUrl}/films/${id}`, film)
-      .pipe(
-        catchError(error => this.handleError('update', 'Film', error))
-      );
+      .pipe(catchError(error => this.handleError('update', 'Film', error)));
   }
-
-  // ==================== SERIES CRUD ====================
 
   createSeries(series: SeriesDTO): Observable<SeriesDTO> {
     return this.http.post<SeriesDTO>(`${this.contentsBaseUrl}/series`, series)
-      .pipe(
-        catchError(error => this.handleError('create', 'Series', error))
-      );
+      .pipe(catchError(error => this.handleError('create', 'Series', error)));
   }
 
   updateSeries(id: string, series: SeriesDTO): Observable<SeriesDTO> {
     return this.http.put<SeriesDTO>(`${this.contentsBaseUrl}/series/${id}`, series)
-      .pipe(
-        catchError(error => this.handleError('update', 'Series', error))
-      );
+      .pipe(catchError(error => this.handleError('update', 'Series', error)));
   }
-
-  // ==================== DOCUMENTARIES CRUD ====================
 
   createDocumentary(doc: DocumentaryDTO): Observable<DocumentaryDTO> {
     return this.http.post<DocumentaryDTO>(`${this.contentsBaseUrl}/documentaries`, doc)
-      .pipe(
-        catchError(error => this.handleError('create', 'Documentary', error))
-      );
+      .pipe(catchError(error => this.handleError('create', 'Documentary', error)));
   }
 
   updateDocumentary(id: string, doc: DocumentaryDTO): Observable<DocumentaryDTO> {
     return this.http.put<DocumentaryDTO>(`${this.contentsBaseUrl}/documentaries/${id}`, doc)
-      .pipe(
-        catchError(error => this.handleError('update', 'Documentary', error))
-      );
+      .pipe(catchError(error => this.handleError('update', 'Documentary', error)));
   }
-
-  // ==================== GENERIC CONTENT ====================
 
   getAllContent(): Observable<ContentDTO[]> {
     return this.http.get<ContentDTO[]>(this.contentsBaseUrl)
-      .pipe(
-        catchError(error => this.handleError('read', 'Content', error))
-      );
+      .pipe(catchError(error => this.handleError('read', 'Content', error)));
   }
 
   getContentPaginated(
@@ -172,18 +147,12 @@ export class ContentService {
 
   deleteContent(id: string): Observable<void> {
     return this.http.delete<void>(`${this.contentsBaseUrl}/${id}`)
-      .pipe(
-        catchError(error => this.handleError('delete', 'Content', error))
-      );
+      .pipe(catchError(error => this.handleError('delete', 'Content', error)));
   }
-
-  // ==================== CATEGORIES CRUD ====================
 
   createCategory(category: CategoryDTO): Observable<CategoryDTO> {
     return this.http.post<CategoryDTO>(this.categoriesBaseUrl, category)
-      .pipe(
-        catchError(error => this.handleError('create', 'Category', error))
-      );
+      .pipe(catchError(error => this.handleError('create', 'Category', error)));
   }
 
   getCategoryById(id: string): Observable<CategoryDTO> {
@@ -198,19 +167,13 @@ export class ContentService {
 
   updateCategory(id: string, category: CategoryDTO): Observable<CategoryDTO> {
     return this.http.put<CategoryDTO>(`${this.categoriesBaseUrl}/${id}`, category)
-      .pipe(
-        catchError(error => this.handleError('update', 'Category', error))
-      );
+      .pipe(catchError(error => this.handleError('update', 'Category', error)));
   }
 
   deleteCategory(id: string): Observable<void> {
     return this.http.delete<void>(`${this.categoriesBaseUrl}/${id}`)
-      .pipe(
-        catchError(error => this.handleError('delete', 'Category', error))
-      );
+      .pipe(catchError(error => this.handleError('delete', 'Category', error)));
   }
-
-  // ==================== NOTIFICATIONS CRUD ====================
 
   getNotifications(): Observable<NotificationDTO[]> {
     return this.http.get<NotificationDTO[]>(this.notificationsBaseUrl)
@@ -219,67 +182,45 @@ export class ContentService {
 
   createNotification(notification: NotificationDTO): Observable<NotificationDTO> {
     return this.http.post<NotificationDTO>(this.notificationsBaseUrl, notification)
-      .pipe(
-        catchError(error => this.handleError('create', 'Notification', error))
-      );
+      .pipe(catchError(error => this.handleError('create', 'Notification', error)));
   }
 
   deleteNotification(id: string): Observable<void> {
     return this.http.delete<void>(`${this.notificationsBaseUrl}/${id}`)
-      .pipe(
-        catchError(error => this.handleError('delete', 'Notification', error))
-      );
+      .pipe(catchError(error => this.handleError('delete', 'Notification', error)));
   }
-
-  // ==================== GENRES CRUD ====================
 
   createGenre(genre: GenreDTO): Observable<GenreDTO> {
     return this.http.post<GenreDTO>(this.genresBaseUrl, genre)
-      .pipe(
-        catchError(error => this.handleError('create', 'Genre', error))
-      );
+      .pipe(catchError(error => this.handleError('create', 'Genre', error)));
   }
 
   getGenreById(id: string): Observable<GenreDTO> {
     return this.http.get<GenreDTO>(`${this.genresBaseUrl}/${id}`)
-      .pipe(
-        catchError(error => this.handleError('read', 'Genre', error))
-      );
+      .pipe(catchError(error => this.handleError('read', 'Genre', error)));
   }
 
   getAllGenres(): Observable<GenreDTO[]> {
     return this.http.get<GenreDTO[]>(this.genresBaseUrl)
-      .pipe(
-        catchError(error => this.handleError('read', 'Genres', error))
-      );
+      .pipe(catchError(error => this.handleError('read', 'Genres', error)));
   }
 
   updateGenre(id: string, genre: GenreDTO): Observable<GenreDTO> {
     return this.http.put<GenreDTO>(`${this.genresBaseUrl}/${id}`, genre)
-      .pipe(
-        catchError(error => this.handleError('update', 'Genre', error))
-      );
+      .pipe(catchError(error => this.handleError('update', 'Genre', error)));
   }
 
   deleteGenre(id: string): Observable<void> {
     return this.http.delete<void>(`${this.genresBaseUrl}/${id}`)
-      .pipe(
-        catchError(error => this.handleError('delete', 'Genre', error))
-      );
+      .pipe(catchError(error => this.handleError('delete', 'Genre', error)));
   }
-
-  // ==================== ERROR HANDLING ====================
 
   private handleError(operation: string, entity: string, error: HttpErrorResponse) {
     let errorMessage = 'Unknown error occurred';
-
-    // Check if it's a client-side error event
     if (error.error instanceof ErrorEvent) {
       errorMessage = error.error.message || 'Network error occurred';
     } else {
-      // Server-side error
       if (error.error?.errors && typeof error.error.errors === 'object') {
-        // Handle validation errors
         const fieldErrors = Object.entries(error.error.errors)
           .map(([field, message]) => `${field}: ${message}`)
           .join(', ');
@@ -303,25 +244,16 @@ export class ContentService {
         errorMessage = statusMessages[error.status] || `HTTP Error ${error.status}: ${error.statusText || 'Unknown error'}`;
       }
     }
-
-    console.error(`Failed to ${operation} ${entity}:`, {
-      statusCode: error.status,
-      message: errorMessage,
-      fullError: error
-    });
+    console.error(`Failed to ${operation} ${entity}:`, { statusCode: error.status, message: errorMessage, fullError: error });
     return throwError(() => new Error(errorMessage));
   }
 }
 
-/**
- * Category Service
- * @deprecated Use ContentService instead
- */
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryService {
-  private baseUrl = 'http://localhost:8090/api/categories';
+  private baseUrl = 'https://app-backend-linux.azurewebsites.net/api/categories';
 
   constructor(private http: HttpClient) { }
 
@@ -356,15 +288,11 @@ export class CategoryService {
   }
 }
 
-/**
- * Notification Service
- * @deprecated Use ContentService instead
- */
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
-  private baseUrl = 'http://localhost:8090/api/notifications';
+  private baseUrl = 'https://app-backend-linux.azurewebsites.net/api/notifications';
 
   constructor(private http: HttpClient) { }
 
@@ -395,7 +323,6 @@ export class NotificationService {
 
   private handleError(operation: string, entity: string, error: HttpErrorResponse) {
     let errorMessage = 'Unknown error occurred';
-    
     if (error.error instanceof ErrorEvent) {
       errorMessage = error.error.message || 'Network error occurred';
     } else {
@@ -414,7 +341,6 @@ export class NotificationService {
         errorMessage = statusMessages[error.status] || `HTTP Error ${error.status}`;
       }
     }
-    
     console.error(`Failed to ${operation} ${entity}:`, { statusCode: error.status, message: errorMessage, error });
     return throwError(() => new Error(errorMessage));
   }

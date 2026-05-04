@@ -7,8 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class WatchpartyService {
 
-  private apiUrl = 'http://localhost:8090/watchparty';
-
+private apiUrl = 'https://app-backend-linux.azurewebsites.net/watchparty';
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<any[]> {
